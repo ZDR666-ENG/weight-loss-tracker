@@ -1,25 +1,22 @@
 export const dynamic = "force-dynamic"
 
 export async function GET() {
-  const results: string[] = []
-
-  // Step 1: just import
+  // Step 1: dynamic import
+  let prisma: any
   try {
-    const { prisma } = await import("@/lib/prisma")
-    results.push("Step 1: import ok")
+    const mod = await import("@/lib/prisma")
+    prisma = mod.prisma
   } catch (e: unknown) {
     const err = e as Error
-    return Response.json({ step: "import", error: err.message, stack: err.stack?.split("\n").slice(0, 10) })
+    return Response.json({ step: "import", error: err.message })
   }
 
-  // Step 2: try raw query
+  // Step 2: raw query
   try {
-    const result = await (prisma as any).$queryRaw`SELECT 1 as test`
-    results.push("Step 2: raw query ok: " + JSON.stringify(result))
+    const result = await prisma.$queryRaw`SELECT 1 as test`
+    return Response.json({ ok: true, step: "rawQuery", result })
   } catch (e: unknown) {
     const err = e as Error
-    return Response.json({ step: "rawQuery", error: err.message, results })
+    return Response.json({ step: "rawQuery", error: err.message })
   }
-
-  return Response.json({ ok: true, results })
 }
