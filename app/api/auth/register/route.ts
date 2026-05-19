@@ -27,7 +27,8 @@ export async function POST(request: Request) {
     await setSessionCookie(token)
 
     return Response.json({ user: { id: user.id, name: user.name, email: user.email } })
-  } catch {
-    return Response.json({ error: "注册失败，请稍后重试" }, { status: 500 })
+  } catch (e: unknown) {
+    const err = e as Error
+    return Response.json({ error: err.message || "注册失败，请稍后重试" }, { status: 500 })
   }
 }
