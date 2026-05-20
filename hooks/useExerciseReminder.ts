@@ -34,12 +34,12 @@ export function useExerciseReminder() {
   const lastFiredRef = useRef<Record<string, string>>({}) // "08:00" -> "2026-05-20"
 
   useEffect(() => {
-    setPermission(Notification.permission)
+    setPermission(typeof Notification !== "undefined" ? Notification.permission : "denied")
     setSettings(getSettings())
   }, [])
 
   const requestPermission = useCallback(async () => {
-    if (!("Notification" in window)) return "denied" as NotificationPermission
+    if (typeof window === "undefined" || !("Notification" in window)) return "denied" as NotificationPermission
     const result = await Notification.requestPermission()
     setPermission(result)
     return result
