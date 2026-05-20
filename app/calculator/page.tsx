@@ -1,13 +1,22 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function CalculatorPage() {
+  const router = useRouter()
   const [height, setHeight] = useState("")
   const [weight, setWeight] = useState("")
   const [age, setAge] = useState("")
   const [gender, setGender] = useState("male")
   const [result, setResult] = useState<{ bmi: number; bmr: number; category: string } | null>(null)
+  const [authChecked, setAuthChecked] = useState(false)
+
+  useEffect(() => {
+    fetch("/api/auth/me").then((r) => r.json()).then((d) => {
+      if (!d.user) router.push("/auth/login")
+    }).finally(() => setAuthChecked(true))
+  }, [])
 
   function calculate() {
     const h = parseFloat(height) / 100 // cm to m
@@ -38,6 +47,10 @@ export default function CalculatorPage() {
     "正常": "text-green-600 bg-green-50",
     "偏胖": "text-orange-600 bg-orange-50",
     "肥胖": "text-red-600 bg-red-50",
+  }
+
+  if (!authChecked) {
+    return <div className="flex min-h-screen items-center justify-center"><p className="text-gray-400">加载中...</p></div>
   }
 
   return (

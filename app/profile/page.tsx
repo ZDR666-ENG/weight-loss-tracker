@@ -1,12 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
 export default function ProfilePage() {
+  const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [form, setForm] = useState({ name: "", height: "", weight: "", age: "", gender: "", goalWeight: "" })
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
     fetch("/api/auth/me").then((r) => r.json()).then((d) => {
@@ -20,8 +23,10 @@ export default function ProfilePage() {
           gender: d.user.gender || "",
           goalWeight: d.user.goalWeight?.toString() || "",
         })
+      } else {
+        router.push("/auth/login")
       }
-    })
+    }).finally(() => setAuthChecked(true))
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -46,6 +51,10 @@ export default function ProfilePage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (!authChecked) {
+    return <div className="flex min-h-screen items-center justify-center"><p className="text-gray-400">加载中...</p></div>
   }
 
   return (

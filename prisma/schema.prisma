@@ -9,21 +9,23 @@ datasource db {
 }
 
 model User {
-  id         String      @id @default(cuid())
-  name       String
-  email      String      @unique
-  password   String
-  height     Float?
-  weight     Float?
-  age        Int?
-  gender     String?
-  goalWeight Float?
-  createdAt  DateTime    @default(now())
-  weightLogs WeightLog[]
-  meals      Meal[]
-  posts      Post[]
-  comments   Comment[]
-  likes      Like[]
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  password      String
+  height        Float?
+  weight        Float?
+  age           Int?
+  gender        String?
+  goalWeight    Float?
+  createdAt     DateTime       @default(now())
+  weightLogs    WeightLog[]
+  meals         Meal[]
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  exerciseLogs  ExerciseLog[]
+  exercisePlans ExercisePlan[]
 }
 
 model WeightLog {
@@ -76,4 +78,26 @@ model Like {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId])
+}
+
+model ExerciseLog {
+  id         String   @id @default(cuid())
+  userId     String
+  type       String
+  duration   Int      // minutes
+  calories   Float
+  date       DateTime @default(now())
+  note       String?
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ExercisePlan {
+  id         String @id @default(cuid())
+  userId     String
+  dayOfWeek  Int    // 0=Monday, 6=Sunday
+  type       String
+  duration   Int    // planned minutes
+  calories   Float  // estimated calories
+  note       String?
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

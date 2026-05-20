@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import Link from "next/link"
 
@@ -21,12 +22,20 @@ interface Meal {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [weights, setWeights] = useState<WeightLog[]>([])
   const [meals, setMeals] = useState<Meal[]>([])
   const [user, setUser] = useState<any>(null)
+  const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
-    fetch("/api/auth/me").then((r) => r.json()).then((d) => setUser(d.user))
+    fetch("/api/auth/me").then((r) => r.json()).then((d) => {
+      if (d.user) {
+        setUser(d.user)
+      } else {
+        router.push("/auth/login")
+      }
+    }).finally(() => setAuthChecked(true))
     fetch("/api/weight").then((r) => r.json()).then((d) => setWeights(d.logs || []))
     fetch("/api/meals").then((r) => r.json()).then((d) => setMeals(d.meals || []))
   }, [])
@@ -46,10 +55,16 @@ export default function DashboardPage() {
       weight: w.weight,
     }))
 
+  if (!authChecked) {
+    return <div className="flex min-h-screen items-center justify-center"><p className="text-gray-400">加载中...</p></div>
+  }
+
+  if (!user) return null
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
       <h2 className="text-xl font-bold text-gray-800">
-        👋 你好，{user?.name || "..."}
+        👋 你好，{user.name}
       </h2>
 
       {/* Stats Cards */}

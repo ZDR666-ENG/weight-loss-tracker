@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
 interface Meal {
   id: string
@@ -22,11 +23,13 @@ const mealTypes = [
 ]
 
 export default function DietPage() {
+  const router = useRouter()
   const [meals, setMeals] = useState<Meal[]>([])
   const [date, setDate] = useState(new Date().toISOString().split("T")[0])
   const [form, setForm] = useState({ name: "", calories: "", protein: "", carbs: "", fat: "", mealType: "other" })
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
 
   async function loadMeals() {
     const res = await fetch(`/api/meals?date=${date}`)
@@ -34,7 +37,13 @@ export default function DietPage() {
     setMeals(data.meals || [])
   }
 
-  useEffect(() => { loadMeals() }, [date])
+  useEffect(() => {
+    fetch("/api/auth/me").then((r) => r.json()).then((d) => {
+      if (!d.user) router.push("/auth/login")
+    }).finally(() => setAuthChecked(true))
+  }, [])
+
+  useEffect(() => { if (authChecked) loadMeals() }, [date])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -66,6 +75,10 @@ export default function DietPage() {
   const totalProtein = meals.reduce((s, m) => s + m.protein, 0)
   const totalCarbs = meals.reduce((s, m) => s + m.carbs, 0)
   const totalFat = meals.reduce((s, m) => s + m.fat, 0)
+
+  if (!authChecked) {
+    return <div className="flex min-h-screen items-center justify-center"><p className="text-gray-400">加载中...</p></div>
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">

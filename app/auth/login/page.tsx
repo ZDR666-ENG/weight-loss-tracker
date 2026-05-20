@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
@@ -10,6 +10,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d) => { if (d.user) router.push("/dashboard") })
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -78,12 +84,12 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
-          还没有账户？{" "}
-          <Link href="/auth/register" className="text-emerald-600 hover:underline font-medium">
-            立即注册
-          </Link>
-        </p>
+          <p className="mt-6 text-center text-sm text-gray-500">
+            还没有账户？{" "}
+            <Link href="/auth/register" className="text-emerald-600 hover:underline font-medium">
+              立即注册
+            </Link>
+          </p>
       </div>
     </div>
   )

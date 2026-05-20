@@ -83,6 +83,36 @@
       "namedRegex": "^/api/auth/register(?:/)?$"
     },
     {
+      "page": "/api/db-test",
+      "regex": "^/api/db\\-test(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/db\\-test(?:/)?$"
+    },
+    {
+      "page": "/api/debug-db",
+      "regex": "^/api/debug\\-db(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/debug\\-db(?:/)?$"
+    },
+    {
+      "page": "/api/exercise-plan",
+      "regex": "^/api/exercise\\-plan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/exercise\\-plan(?:/)?$"
+    },
+    {
+      "page": "/api/exercises",
+      "regex": "^/api/exercises(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/exercises(?:/)?$"
+    },
+    {
+      "page": "/api/health",
+      "regex": "^/api/health(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/health(?:/)?$"
+    },
+    {
       "page": "/api/meals",
       "regex": "^/api/meals(?:/)?$",
       "routeKeys": {},
@@ -141,6 +171,18 @@
       "regex": "^/diet(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/diet(?:/)?$"
+    },
+    {
+      "page": "/exercise",
+      "regex": "^/exercise(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/exercise(?:/)?$"
+    },
+    {
+      "page": "/exercise-plan",
+      "regex": "^/exercise\\-plan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/exercise\\-plan(?:/)?$"
     },
     {
       "page": "/favicon.ico",

@@ -11,11 +11,17 @@ package = "@netlify/plugin-nextjs"
 
 [plugins.inputs]
 
+[[plugins]]
+origin = "config"
+package = "./plugins/fix-prisma"
+
+[plugins.inputs]
+
 [build]
 publish = "C:\\Users\\lenovo\\weight-loss-tracker\\.next"
 publishOrigin = "config"
 commandOrigin = "config"
-command = "npm run build"
+command = "npx prisma generate && npm run build && node scripts/fix-prisma-symlink.cjs"
 
 [build.environment]
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
 interface Post {
   id: string
@@ -13,14 +14,22 @@ interface Post {
 }
 
 export default function CommunityPage() {
+  const router = useRouter()
   const [posts, setPosts] = useState<Post[]>([])
   const [content, setContent] = useState("")
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null)
   const [loading, setLoading] = useState(false)
   const [commentText, setCommentText] = useState<Record<string, string>>({})
+  const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
-    fetch("/api/auth/me").then((r) => r.json()).then((d) => setCurrentUser(d.user))
+    fetch("/api/auth/me").then((r) => r.json()).then((d) => {
+      if (d.user) {
+        setCurrentUser(d.user)
+      } else {
+        router.push("/auth/login")
+      }
+    }).finally(() => setAuthChecked(true))
     loadPosts()
   }, [])
 
@@ -59,6 +68,10 @@ export default function CommunityPage() {
     })
     setCommentText({ ...commentText, [postId]: "" })
     loadPosts()
+  }
+
+  if (!authChecked) {
+    return <div className="flex min-h-screen items-center justify-center"><p className="text-gray-400">加载中...</p></div>
   }
 
   return (

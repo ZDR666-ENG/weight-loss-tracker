@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
 interface WeightLog {
@@ -11,12 +12,14 @@ interface WeightLog {
 }
 
 export default function WeightPage() {
+  const router = useRouter()
   const [logs, setLogs] = useState<WeightLog[]>([])
   const [weight, setWeight] = useState("")
   const [note, setNote] = useState("")
   const [date, setDate] = useState(new Date().toISOString().split("T")[0])
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
 
   async function loadLogs() {
     const res = await fetch("/api/weight")
@@ -24,7 +27,15 @@ export default function WeightPage() {
     setLogs(data.logs || [])
   }
 
-  useEffect(() => { loadLogs() }, [])
+  useEffect(() => {
+    fetch("/api/auth/me").then((r) => r.json()).then((d) => {
+      if (d.user) {
+        loadLogs()
+      } else {
+        router.push("/auth/login")
+      }
+    }).finally(() => setAuthChecked(true))
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -62,6 +73,10 @@ export default function WeightPage() {
     date: new Date(w.recordedAt).toLocaleDateString("zh-CN", { month: "short", day: "numeric" }),
     weight: w.weight,
   }))
+
+  if (!authChecked) {
+    return <div className="flex min-h-screen items-center justify-center"><p className="text-gray-400">加载中...</p></div>
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">

@@ -1,6 +1,12 @@
 import Link from "next/link"
+import { cookies } from "next/headers"
+import { verifyToken } from "@/lib/auth"
 
-export default function Home() {
+export default async function Home() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("token")?.value
+  const userId = token ? await verifyToken(token) : null
+
   return (
     <div className="flex flex-col">
       {/* Hero */}
@@ -13,18 +19,29 @@ export default function Home() {
             记录体重变化、管理每日饮食、计算身体指标，在社区中找到同伴一起进步
           </p>
           <div className="flex gap-4 justify-center">
-            <Link
-              href="/auth/register"
-              className="bg-emerald-500 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-emerald-600 transition shadow-lg shadow-emerald-200"
-            >
-              免费开始
-            </Link>
-            <Link
-              href="/auth/login"
-              className="bg-white text-emerald-600 px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-50 transition border border-emerald-200"
-            >
-              登录
-            </Link>
+            {userId ? (
+              <Link
+                href="/dashboard"
+                className="bg-emerald-500 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-emerald-600 transition shadow-lg shadow-emerald-200"
+              >
+                进入仪表盘
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/auth/register"
+                  className="bg-emerald-500 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-emerald-600 transition shadow-lg shadow-emerald-200"
+                >
+                  免费开始
+                </Link>
+                <Link
+                  href="/auth/login"
+                  className="bg-white text-emerald-600 px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-50 transition border border-emerald-200"
+                >
+                  登录
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
