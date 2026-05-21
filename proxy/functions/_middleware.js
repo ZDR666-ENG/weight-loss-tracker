@@ -1,6 +1,4 @@
 // Cloudflare Pages reverse proxy to Vercel deployment
-// This file goes in proxy/functions/_middleware.js
-
 export async function onRequest(context) {
   const { request } = context
   const url = new URL(request.url)
@@ -12,25 +10,41 @@ export async function onRequest(context) {
   const modifiedHeaders = new Headers(request.headers)
   modifiedHeaders.set("Host", "weight-loss-tracker-seven.vercel.app")
 
+  // Only include body for methods that support it
+  const methodsWithBody = ["POST", "PUT", "PATCH", "DELETE"]
+  const body = methodsWithBody.includes(request.method) ? request.body : undefined
+
   const modifiedRequest = new Request(url.toString(), {
     method: request.method,
     headers: modifiedHeaders,
-    body: request.method !== "GET" && request.method !== "HEAD" ? request.body : undefined,
+    body,
     redirect: "manual",
   })
 
-  // Forward to Vercel
-  const response = await fetch(modifiedRequest)
+  try {
+    // Forward to Vercel
+    const response = await fetch(modifiedRequest)
 
-  // Create response with original headers
-  const responseHeaders = new Headers(response.headers)
-  responseHeaders.delete("content-encoding") // Let Cloudflare handle compression
-  responseHeaders.delete("content-length")
-  responseHeaders.set("x-proxied-by", "cloudflare-pages")
+    // Create response with original headers
+    const responseHeaders = new Headers(response.headers)
+    responseHeaders.delete("content-encoding")
+    responseHeaders.delete("content-length")
+    responseHeaders.delete("transfer-encoding")
+    responseHeaders.set("x-proxied-by", "cloudflare-pages")
 
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: responseHeaders,
-  })
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: responseHeaders,
+    })
+  } catch (err) {
+    return new Response(JSON.stringify({
+      error: "Proxy error",
+      message: err.message,
+      url: url.toString(),
+    }), {
+      status: 502,
+      headers: { "Content-Type": "application/json" },
+    })
+  }
 }

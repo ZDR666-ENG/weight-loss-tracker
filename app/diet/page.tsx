@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import FoodAnalyzer from "@/components/FoodAnalyzer"
 
 interface Meal {
   id: string
@@ -172,6 +173,9 @@ export default function DietPage() {
           {loading ? "添加中..." : "添加食物"}
         </button>
       </form>
+
+      {/* AI Food Analyzer */}
+      <FoodAnalyzer onSaved={loadMeals} />
 
       {/* Meal List */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
